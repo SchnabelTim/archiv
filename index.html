@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Freedom of Expression Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #36393f;
+        color: #dcddde;
+        margin: 0;
+        padding: 20px;
+    }
+    header {
+        background-color: #202225;
+        padding: 10px 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 500;
+    }
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 20px;
+        background-color: #2f3136;
+        color: #dcddde;
+        border: 1px solid #4f545c;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+        appearance: none;
+    }
+    .message {
+        border-bottom: 1px solid #4f545c;
+        padding: 10px 0;
+    }
+    .author {
+        font-weight: bold;
+        color: #7289da;
+    }
+    .timestamp {
+        color: #72767d;
+        font-size: 0.75rem;
+    }
+    .content {
+        margin-top: 5px;
+    }
+</style>
+</head>
+<body>
+<select id="fileSelector">
+    <option value="">Select Archive</option>
+    <!-- Beispiel für Dateinamen. Diese sollten durch tatsächliche Dateipfade ersetzt werden. -->
+    <option value="no freedom of expression (fox).txt">no freedom of expression (fox).txt</option>
+    <!-- Fügen Sie hier weitere Optionen entsprechend den Dateien in Ihrem 'archiv' Ordner hinzu -->
+</select>
+
+<div id="chat"></div>
+
+<script>
+    document.getElementById('fileSelector').addEventListener('change', function() {
+        const fileName = this.value;
+        if (!fileName) {
+            document.getElementById('chat').innerHTML = '';
+            return;
+        }
+        fetch(`archiv/${fileName}`)
+            .then(response => response.text())
+            .then(text => {
+                displayMessages(text);
+            })
+            .catch(error => console.error('Fehler beim Laden der Datei:', error));
+    });
+
+    function displayMessages(fileContents) {
+        const chatDiv = document.getElementById('chat');
+        chatDiv.innerHTML = ''; // Clear previous messages
+        const lines = fileContents.split('\n');
+        let msgDiv = null;
+        lines.forEach(line => {
+            if (line.trim() === '') return; // Skip empty lines
+
+
+            const parts = line.split(' — ');
+
+            console.log(line,parts.length)
+
+            if(parts.length == 1){
+            const content = parts[0];
+            msgDiv.innerHTML += `<div class="content">${content}</div>`;
+
+            }else{
+                if (msgDiv != null) chatDiv.appendChild(msgDiv);
+            msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');  
+            
+            const author = parts[0];
+            const time = parts[1];
+            msgDiv.innerHTML = `<span class="author">${author}</span> — <span class="timestamp">${time}</span>`;
+            
+            }
+
+            
+        });
+    }
+</script>
+</body>
+</html>
